@@ -1,0 +1,55 @@
+BUILD FIRST
+userModel (admins and game masters)
+    - id (automatic)
+    - email
+    - password
+    - role
+
+BUILD SECOND
+gamePlanModel (reusable, does not save state)
+    - id (automatic)
+    - title
+    - rule flags (optional)
+    - map
+    - markers[
+        markerId1,
+        markerId2
+        ] (separate model)
+        
+    - ownerId
+
+markerModel (Child of gamePlanModel)
+    - gamePlanId
+    - title
+    - content
+        - position
+            - x
+            - y
+    - qrcode
+    - quiz: {
+        - question
+        - answers: [
+            - text
+            - isCorrect
+            ]
+
+BUILD THIRD
+activeGameModel (saves state, is generated when game is started)
+    - id (automatic)
+    - information transferred from gamePlanModel (so the latter can be modified during an ongoing game)
+    - game started time (if it's a timed game)
+    - list of players (separate model)
+        - player 1 (activated: true)
+        - player 2 (activated: false)
+
+BUILD FOURTH
+playerModel (player is generated when it successfully joins a game)
+    - id (automatic)
+    - name
+    - points
+    - amount of markers found
+
+
+History is saved separately after game ends
+
+
