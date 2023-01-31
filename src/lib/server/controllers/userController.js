@@ -1,16 +1,7 @@
-// @ts-nocheck
-import { User } from '../db/dbConnection';
+import { User } from '../db/dbConnection.js';
 import bcrypt from 'bcryptjs';
-import type express from 'express';
-import type { NextFunction } from 'express';
 
-declare module 'express-session' {
-	export interface SessionData {
-		userId: { [key: string]: any };
-	}
-}
-
-export async function createUser(req: express.Request, res: express.Response, next: NextFunction) {
+export async function createUser(req, res, next) {
 	try {
 		const { email, password, role } = req.body;
 		const re = /\S+@\S+\.\S+/;
@@ -37,7 +28,7 @@ export async function createUser(req: express.Request, res: express.Response, ne
 	}
 }
 
-export async function loginUser(req: express.Request, res: express.Response, next: NextFunction) {
+export async function loginUser(req, res, next) {
 	try {
 		const { email, password } = req.body;
 		if (email && password) {
@@ -55,7 +46,7 @@ export async function loginUser(req: express.Request, res: express.Response, nex
 							email: user.email,
 							role: user.role
 						};
-						req.session!.user = sessionUser;
+						req.session.user = sessionUser;
 						console.log('AT LOGIN req.session.user', req.session.user);
 						// save the session before redirection to ensure page
 						// load does not happen before session is saved
@@ -88,11 +79,7 @@ export async function loginUser(req: express.Request, res: express.Response, nex
 //delete any (admin)
 
 //FIND TEST ENDPOINTS BELOW - > REMOVE LATER
-export async function publicdataUser(
-	req: express.Request,
-	res: express.Response,
-	next: NextFunction
-) {
+export async function publicdataUser(req, res, next) {
 	try {
 		console.log('PD req.session.cookie ', req.session.cookie);
 		console.log('PD req.sessionID ', req.sessionID);
@@ -110,11 +97,7 @@ export async function publicdataUser(
 	}
 }
 
-export async function userdataUser(
-	req: express.Request,
-	res: express.Response,
-	next: NextFunction
-) {
+export async function userdataUser(req, res, next) {
 	try {
 		console.log('UD req.session.cookie ', req.session.cookie);
 		console.log('UD req.sessionID ', req.sessionID);
@@ -132,11 +115,7 @@ export async function userdataUser(
 	}
 }
 
-export async function admindataUser(
-	req: express.Request,
-	res: express.Response,
-	next: NextFunction
-) {
+export async function admindataUser(req, res, next) {
 	try {
 		console.log('AD req.session.cookie ', req.session.cookie);
 		console.log('AD req.sessionID ', req.sessionID);
@@ -154,7 +133,7 @@ export async function admindataUser(
 	}
 }
 
-export async function logoutUser(req: express.Request, res: express.Response, next: NextFunction) {
+export async function logoutUser(req, res, next) {
 	req.session.user = null;
 	req.session.save(function (err) {
 		if (err) next(err);

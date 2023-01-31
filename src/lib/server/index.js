@@ -1,12 +1,11 @@
-// @ts-nocheck
 import express from 'express';
 import session from 'express-session';
 import mongoose from 'mongoose';
 //import { mongoPromise } from './db/dbConnection';
 
-import userRouter from './routes/userRoutes';
-import gamePlanRouter from './routes/gamePlanRoutes';
-import gameRouter from './routes/gameRoutes';
+import userRouter from './routes/userRoutes.js';
+import gamePlanRouter from './routes/gamePlanRoutes.js';
+import gameRouter from './routes/gameRoutes.js';
 
 import MongoStore from 'connect-mongo';
 import cors from 'cors';
@@ -15,7 +14,7 @@ import cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 dotenv.config();
 const port = process.env.PORT;
-const secret = process.env.SESSION_SECRET!;
+const secret = process.env.SESSION_SECRET;
 
 import path from 'path';
 import { fileURLToPath } from 'url';

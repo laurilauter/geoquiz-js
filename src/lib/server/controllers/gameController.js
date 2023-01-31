@@ -1,11 +1,10 @@
 // @ts-nocheck
-import { GamePlan } from '../db/dbConnection';
-import { Game } from '../db/dbConnection';
-import ActiveGame from '../classes/ActiveGame';
-import type express from 'express';
+import { GamePlan } from '../db/dbConnection.js';
+import { Game } from '../db/dbConnection.js';
+import ActiveGame from '../classes/ActiveGame.js';
 const baseUrl = process.env.VITE_AXIOS_BASE_URL_DEV;
 
-let currentGame: any;
+let currentGame;
 //import moment from "moment";
 
 //ENDPOINTS
@@ -22,27 +21,22 @@ let currentGame: any;
 
 //req -> gamePlan id, res -> joining link
 
-export async function activateGame(req: express.Request, res: express.Response): Promise<void> {
+export async function activateGame(req, res) {
 	try {
 		const { gamePlanId } = req.body;
 		let foundGamePlan = await GamePlan.findOne({ _id: gamePlanId });
 		if (foundGamePlan) {
-			//check if any games are running with this id and owner
-			let foundGame = await Game.findOne({ _id: foundGamePlan!._id.toString() });
-			console.log('foundGamePlan.ownerId ', foundGamePlan.ownerId);
-			//console.log('foundGame!.ownerId ', foundGame.gamePlan.ownerId);
-			//if (foundGamePlan.ownerId !== foundGame!.gamePlan!.ownerId) {
-			if (foundGamePlan) {
+			let foundGame = await Game.findOne({ gameOwnerId: foundGamePlan.ownerId });
+			if (!foundGame) {
 				currentGame = new ActiveGame(foundGamePlan);
-				console.log(' currentGame', currentGame);
 				//make this link a QR code for the game master in the client
 				res.status(200).send({
-					joinUrl: baseUrl + '/join/' + currentGame.getActiveGameId
-					//this could be a separate endpoint in case th eowner needs
+					joinUrl: baseUrl + '/join/' + currentGame.gameId
+					//this could be a separate endpoint in case the owner needs
 					//to get the link again without relaunching the game
 				});
 			} else {
-				res.status(403).send({ error: 'The user is already hosting this game' });
+				res.status(400).send({ error: 'The user is already hosting this game' });
 			}
 		} else {
 			res.status(404).send({ error: 'Game Plan not found' });
@@ -52,8 +46,26 @@ export async function activateGame(req: express.Request, res: express.Response):
 	}
 }
 
+export async function shareJoinLink(req, res) {
+	try {
+		const { gameId } = req.body;
+		let foundGame = await Game.findOne({ gameId: gameId });
+		if (foundGame) {
+			res.status(200).send({
+				joinUrl: baseUrl + '/join/' + foundGame.gameId
+				//this could be a separate endpoint in case the owner needs
+				//to get the link again without relaunching the game
+			});
+		} else {
+			res.status(404).send({ error: 'Game not found' });
+		}
+	} catch (error) {
+		res.status(500).send({ error: error });
+	}
+}
+
 //Fix this
-export async function setName(req: express.Request, res: express.Response): Promise<void> {
+export async function setName(req, res) {
 	const { name } = req.body;
 	try {
 		if (name) {

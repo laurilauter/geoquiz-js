@@ -1,24 +1,23 @@
 // @ts-nocheck
-import { Game, GamePlan } from '../db/dbConnection';
+import { Game, GamePlan } from '../db/dbConnection.js';
 import crypto from 'crypto';
 import moment from 'moment';
 
 class ActiveGame {
-	gameId: string;
-	gamePlan: typeof GamePlan;
-	isGameActive: boolean; //if true game can be started/ended if false its paused/archived
-	duaration: number;
-	isGameArchived: boolean = false; //cant be unpaused, will only show in archived games
-	isStarted: boolean = false; //current state of game
+	gameId;
+	gameOwnerId;
+	gamePlan;
+	isGameActive;
+	isGameArchived = false; //cant be unpaused, will only show in archived games
+	isStarted = false;
+	duaration;
 	players = [];
 
-	constructor(gamePlan: typeof GamePlan) {
-		//perhaps instead of passing an object, pass the id and do a query to fill fields
-		console.log('gamePlan gameDuration ', gamePlan);
-		console.log('gamePlan gameDuration ', gamePlan.gameDuration);
+	constructor(gamePlan) {
 		this.gameId = crypto.randomUUID();
 		this.gamePlan = gamePlan;
-		this.duaration = 60; //gamePlan.gameDuration;
+		this.gameOwnerId = gamePlan.ownerId;
+		this.duaration = gamePlan.gameDuration;
 		this.isGameActive = true;
 		this.saveActiveGame(gamePlan);
 	}
@@ -31,11 +30,11 @@ class ActiveGame {
 		return this.gameId;
 	}
 
-	// get getActiveGameOwnerId() {
-	// 	return this.gameId.ownerId;
-	// }
+	get getActiveGameOwnerId() {
+		return this.gameId.ownerId;
+	}
 
-	async startGame(): Promise<void> {
+	async startGame() {
 		const filter = { _id: this.gameId };
 		const now = moment();
 		const update = {
@@ -52,10 +51,11 @@ class ActiveGame {
 		}
 	}
 
-	async saveActiveGame(gamePlan: typeof GamePlan): Promise<void> {
+	async saveActiveGame(gamePlan) {
 		const newGameData = {
 			gamePlan: gamePlan,
 			gameId: this.gameId,
+			gameOwnerId: this.gameOwnerId,
 			gameStartTime: null,
 			gameEndTime: null,
 			players: []

@@ -1,9 +1,8 @@
-import { GamePlan } from '../db/dbConnection';
-import { Marker } from '../db/dbConnection';
-import type express from 'express';
+import { GamePlan } from '../db/dbConnection.js';
+import { Marker } from '../db/dbConnection.js';
 //import moment from "moment";
 
-export async function createGame(req: express.Request, res: express.Response) {
+export async function createGame(req, res) {
 	try {
 		const { gameTitle, gameMap, ownerId, gameDuaration } = req.body;
 		if (gameTitle && ownerId) {
@@ -26,7 +25,7 @@ export async function createGame(req: express.Request, res: express.Response) {
 }
 
 //make sure the client sends valid gamePlanId in req.body, otherwise it will fail
-export async function createMarker(req: express.Request, res: express.Response) {
+export async function createMarker(req, res) {
 	try {
 		const { marker } = req.body;
 		const newMarker = await Marker.create(marker);
@@ -53,7 +52,7 @@ export async function createMarker(req: express.Request, res: express.Response) 
 	}
 }
 
-export async function listGames(req: express.Request, res: express.Response) {
+export async function listGames(req, res) {
 	try {
 		const list = await GamePlan.find();
 		res.status(200).send(list);
@@ -62,7 +61,7 @@ export async function listGames(req: express.Request, res: express.Response) {
 	}
 }
 
-export async function getGame(req: express.Request, res: express.Response) {
+export async function getGame(req, res) {
 	try {
 		const filter = { _id: req.params.id };
 		let foundGamePlan = await GamePlan.findOne(filter);
@@ -73,7 +72,7 @@ export async function getGame(req: express.Request, res: express.Response) {
 	}
 }
 
-export async function getMarker(req: express.Request, res: express.Response) {
+export async function getMarker(req, res) {
 	try {
 		const filter = { _id: req.params.id };
 		let foundMarker = await Marker.findOne(filter);
@@ -84,7 +83,7 @@ export async function getMarker(req: express.Request, res: express.Response) {
 	}
 }
 
-export async function updateGame(req: express.Request, res: express.Response) {
+export async function updateGame(req, res) {
 	try {
 		const filter = { _id: req.params.id };
 		const { gameTitle, ownerId, gameMap, markers } = req.body;
@@ -104,7 +103,7 @@ export async function updateGame(req: express.Request, res: express.Response) {
 }
 
 //must not update the gamePlanId
-export async function updateMarker(req: express.Request, res: express.Response) {
+export async function updateMarker(req, res) {
 	try {
 		const filter = { _id: req.params.id };
 		const { marker } = req.body;
@@ -116,7 +115,7 @@ export async function updateMarker(req: express.Request, res: express.Response) 
 	}
 }
 
-export async function deleteMarker(req: express.Request, res: express.Response) {
+export async function deleteMarker(req, res) {
 	try {
 		const result = await Marker.deleteOne({ _id: req.params.id });
 		if (result.deletedCount === 0) {
@@ -140,11 +139,11 @@ export async function deleteMarker(req: express.Request, res: express.Response) 
 	}
 }
 
-export async function deleteGame(req: express.Request, res: express.Response) {
+export async function deleteGame(req, res) {
 	try {
 		//finding the game and deleting its markers first
 		const filter = { _id: req.params.id };
-		const foundGamePlan: any = await GamePlan.findOne(filter);
+		const foundGamePlan = await GamePlan.findOne(filter);
 		const markers = foundGamePlan.markers;
 		for (const marker of markers) {
 			const deletingMarker = await Marker.deleteMany({ _id: marker });

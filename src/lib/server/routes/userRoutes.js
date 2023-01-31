@@ -1,19 +1,12 @@
 import express from 'express';
-import type { NextFunction } from 'express';
 const userRouter = express.Router();
-import * as userController from '../controllers/userController';
+import * as userController from '../controllers/userController.js';
 import bodyParser from 'body-parser';
 userRouter.use(bodyParser.json());
 userRouter.use(bodyParser.urlencoded({ extended: false }));
 
-declare module 'express-session' {
-	export interface SessionData {
-		user: { [key: string]: any };
-	}
-}
-
 // middleware to test if authenticated and if role is user or admin
-function isUser(req: express.Request, res: express.Response, next: NextFunction) {
+function isUser(req, res, next) {
 	if (req.session.user) {
 		if (req.session.user.role === 'user' || req.session.user.role === 'admin') {
 			console.log('MW USER req.session.cookie', req.session.cookie);
@@ -23,8 +16,8 @@ function isUser(req: express.Request, res: express.Response, next: NextFunction)
 			next();
 		}
 	} else {
-		console.log('MW USER req.session.cookie', req.session!.cookie);
-		console.log('MW USER req.session.user', req.session!.user);
+		console.log('MW USER req.session.cookie', req.session.cookie);
+		console.log('MW USER req.session.user', req.session.user);
 		console.log('No user or admin in session');
 		res.status(401).send({ error: 'Credentials missing' });
 		//res.redirect("/"); //redirects to root after failed cookie check
@@ -32,7 +25,7 @@ function isUser(req: express.Request, res: express.Response, next: NextFunction)
 }
 
 // middleware to test if authenticated and if role is admin
-function isAdmin(req: express.Request, res: express.Response, next: NextFunction) {
+function isAdmin(req, res, next) {
 	if (req.session.user) {
 		if (req.session.user.role === 'admin') {
 			console.log('MW ADMIN req.session.cookie', req.session.cookie);
@@ -42,8 +35,8 @@ function isAdmin(req: express.Request, res: express.Response, next: NextFunction
 			next();
 		}
 	} else {
-		console.log('MW ADMIN req.session.cookie', req.session!.cookie);
-		console.log('MW ADMIN req.session.user', req.session!.user);
+		console.log('MW ADMIN req.session.cookie', req.session.cookie);
+		console.log('MW ADMIN req.session.user', req.session.user);
 		console.log('No admin in session');
 		res.status(401).send({ error: 'Credentials missing' });
 		//res.redirect("/"); //redirects to root after failed cookie check
